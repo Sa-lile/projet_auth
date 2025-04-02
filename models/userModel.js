@@ -23,6 +23,7 @@ connection.query('SELECT * FROM users', (error, results) => {
 
   console.log('Résultats :', results); 
 }); 
+
 const users = [];
 
 const saveUser = (userData) => {
