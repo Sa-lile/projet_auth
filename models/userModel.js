@@ -23,6 +23,15 @@ connection.query('SELECT * FROM users', (error, results) => {
 
   console.log('Résultats :', results); 
 }); 
+const users = [];
+
+const saveUser = (userData) => {
+    users.push(userData);
+    console.log("Utilisateur enregistré:", userData);
+    return userData;
+};
+
+module.exports = { saveUser };
 
 // Fermer la connexion après avoir terminé 
 connection.end(); 
