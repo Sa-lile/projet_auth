@@ -3,7 +3,7 @@ const userRoute = require('./routes/userRoutes');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv')
-
+const bcrypt = require('bcrypt')
 dotenv.config();
 
 const app = express();
@@ -17,13 +17,14 @@ app.use(cookieParser());
 app.use('/api/users', userRoute);
 
 
-app.get('/register', async(req, res, next) => {
+app.post('/register', async(req, res, next) => {
     const {username, password} = req.body;
     const isAlreadlyRegistered = users.find(user=> user.username === user.username);
     if(!isAlreadlyRegistered){
         res.send('User already exists')
     }
-    const hashedPassword = await bcrypt.hash(username, password);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     users.push({ username, password: hashedPassword})
 
     res.send('User already exists')
