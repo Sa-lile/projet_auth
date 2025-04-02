@@ -18,16 +18,19 @@ connection.connect(err => {
   console.log('Connecté avec succès à la base de données !'); 
 });
 
-
+// Enregistre nouveau utilisateur
 const saveUser = (userData) => {
   //userData : username, password
-    connection.query(`ÌNSERT INTO users (username, password) VALUES(${userData.username},${userData.password})`, (error, result)=> { 
-      if(error) {
-        throw error;
-      } else {
-        console.log(result)
-      }
-      })
+  const query = "INSERT INTO users (username, password) VALUES (?, ?)";
+  const values = [userData.username, userData.password];
+  
+  connection.query(query, values, (error, result) => { 
+    if (error) {
+        console.error("Erreur SQL:", error);
+        return;
+    } 
+    console.log("Utilisateur ajouté :", result);
+});
     return userData;
 };
 
@@ -43,4 +46,5 @@ const getAllUsers = () => {
 module.exports = { saveUser, getAllUsers };
 
 // Fermer la connexion après avoir terminé 
-connection.end(); 
+// connection.end(); 
+// error : Can't add new command when connection is in closed state -> deleted connection.end()

@@ -21,8 +21,8 @@ app.use('/api/users', userRoute);
 app.post('/register', async(req, res, next) => {
     const {username, password} = req.body;
     // const isAlreadlyRegistered = users.find(user => user.username === username);
-    const users = getAllUsers ();
-    const isAlreadlyRegistered = users.find(user =>  user.username === user.password)
+    const users = getAllUsers() || []; // S'assurer que users est bien un tableau;
+    const isAlreadlyRegistered = users.find(user =>  user.username === username);
     if(isAlreadlyRegistered) {
         res.status(400).send('User already registered')
     }
