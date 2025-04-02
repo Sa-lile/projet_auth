@@ -5,12 +5,12 @@ const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv')
 const bcrypt = require('bcrypt')
 dotenv.config();
-const { userModel } = require('./models/userModel')
+const { saveUser, getAllUsers } = require('./models/userModel')
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
-const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
-
+// const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
+const users = []
 // Middleware to parse JSON bodies in requests
 app.use(express.json());
 app.use(express.urlencoded());
@@ -20,18 +20,28 @@ app.use('/api/users', userRoute);
 
 app.post('/register', async(req, res, next) => {
     const {username, password} = req.body;
-    const isAlreadlyRegistered = users.find(user => user.username === username);
-
-    if(isAlreadlyRegistered){
+    // const isAlreadlyRegistered = users.find(user => user.username === username);
+    const users = getAllUsers ();
+    const isAlreadlyRegistered = users.find(user =>  user.username === user.password)
+    if(isAlreadlyRegistered) {
         res.status(400).send('User already registered')
     }
     // Hachage du mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const userData = {
+        username,
+        password : hashedPassword
+    }
 
     // Ajouter l'utilisateur
-    users.push({ username, password: hashedPassword });
-    res.status(400).send('New User successfully registered');
+    // users.push({ username, password: hashedPassword });
+    const result = saveUser(userData);
+    if (result) {
+        res.status(200).send('New User successfully registered');
+    } else {
+        res.status(500).send('New User not registered');
+    }
 })
 
 app.post('/login', async(req, res, next) => {
@@ -51,7 +61,6 @@ app.post('/login', async(req, res, next) => {
         return
     }      // authentication de JWT
     const token = jwt.login({ username: user.username, role: "user"}, jwt_secret_key )
-
 });
 
 
