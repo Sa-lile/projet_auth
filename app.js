@@ -12,13 +12,12 @@ const app = express();
 app.set('view engine', 'ejs');
 // Route racine
 app.get('/', (req, res) => {
-    const utilisateurs = [
-        {nom: 'Lily', password: '12345'},
-        {nom: 'Sachiyo', password: '33333'},
-        ];
-        res.render('index', { utilisateurs });
+        res.render('index', { username: 'Sachiyo', password: '12345' });
     });
 
+app.get('/private', (req, res) => {
+            res.render('private', { username: 'Lily', password: '55555' });
+        });
 
 const PORT = process.env.PORT || 3000; 
 // const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
