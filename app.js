@@ -2,12 +2,24 @@ const express = require('express');
 const userRoute = require('./routes/userRoutes');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const dotenv = require('dotenv')
-const bcrypt = require('bcrypt')
+const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
 dotenv.config();
 const { saveUser, getAllUsers } = require('./models/userModel')
-
 const app = express();
+
+// Spécifier le moteur de templates EJS
+app.set('view engine', 'ejs');
+// Route racine
+app.get('/', (req, res) => {
+    const utilisateurs = [
+        {nom: 'Lily', password: '12345'},
+        {nom: 'Sachiyo', password: '33333'},
+        ];
+        res.render('index', { utilisateurs });
+    });
+
+
 const PORT = process.env.PORT || 3000; 
 // const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
 const users = []
@@ -16,6 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use('/api/users', userRoute);
+
 
 
 app.post('/register', async(req, res, next) => {
@@ -61,6 +74,9 @@ app.post('/login', async(req, res, next) => {
         return
     }      // authentication de JWT
     const token = jwt.login({ username: user.username, role: "user"}, jwt_secret_key )
+
+    // res.cookie('token', token, { httpOnly: true, sameSite: "lax"})
+
 });
 
 
