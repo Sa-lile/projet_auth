@@ -1,15 +1,24 @@
-<form action="POST" id="main">
-	<h2>Login to your account</h2>
- 
-	<div class="input-parent">
-		<label for="username">Username</label>
-		<input type="text" id="username" />
-	</div>
- 
-	<div class="input-parent">
-		<label for="password">Password</label>
-		<input type="password" id="password" />
-	</div>
- 
-	<button type="submit">Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>EJS Form</title>
+</head>
+<body>
+<h1>Login</h1>
+<form method="post" action="/login">
+    <p>
+      <label for="username">Username:</label>
+      <input type="text" name="username" id="username">
+    </p>
+    <p>
+      <label for="password">Password:</label>
+      <input type="text" name="password" id="password">
+    </p>
+    <p>
+      <input type="submit" value="Login">
+    </p>
+  </form>
+  
+</body>
+</html>

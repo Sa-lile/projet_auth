@@ -34,7 +34,8 @@ app.use('/api/users', userRoute);
 app.post('/register', async(req, res, next) => {
     const {username, password} = req.body;
     // const isAlreadlyRegistered = users.find(user => user.username === username);
-    const users = getAllUsers() || []; // S'assurer que users est bien un tableau;
+    const users = await getAllUsers() // S'assurer que users est bien un tableau;
+    console.log(users)
     const isAlreadlyRegistered = users.find(user =>  user.username === username);
     if(isAlreadlyRegistered) {
         res.status(400).send('User already registered')
@@ -75,10 +76,14 @@ app.post('/login', async(req, res, next) => {
     }      // authentication de JWT
     const token = jwt.login({ username: user.username, role: "user"}, jwt_secret_key )
 
-    // res.cookie('token', token, { httpOnly: true, sameSite: "lax"})
-
+    res.cookie('token', token, { httpOnly: true, sameSite: "lax"})
+    res.status(200).send("Bien connect")
 });
 
+
+app.get('/admin', (req, res, next) => {
+    res.status(200).render('private');
+})
 
 app.listen(PORT, () => {
     console.log(process.env)

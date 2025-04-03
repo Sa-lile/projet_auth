@@ -1,5 +1,5 @@
 require('dotenv').config(); 
-const mysql = require('mysql2'); 
+const mysql = require('mysql2/promise'); 
 
 // Configuration de connexion 
 const connection = mysql.createConnection({ 
@@ -10,13 +10,13 @@ const connection = mysql.createConnection({
 }); 
 
 // Connexion à la base de données 
-connection.connect(err => { 
-  if (err) { 
-    console.error('Erreur de connexion :', err.stack); 
-    return;   
-  } 
-  console.log('Connecté avec succès à la base de données !'); 
-});
+// connection.connect(err => { 
+//   if (err) { 
+//     console.error('Erreur de connexion :', err.stack); 
+//     return;   
+//   } 
+//   console.log('Connecté avec succès à la base de données !'); 
+// });
 
 // Enregistre nouveau utilisateur
 const saveUser = (userData) => {
@@ -34,14 +34,9 @@ const saveUser = (userData) => {
     return userData;
 };
 
-const getAllUsers = () => {
-  connection.query('SELECT * FROM users', (error, results) => { 
-    if (error) {
-      throw error; 
-    } else {
-      return results;
-    } 
-  }); 
+const getAllUsers = async() => {
+  const [results] = await connection.query('SELECT * FROM users'); 
+  return results
 }
 module.exports = { saveUser, getAllUsers };
 
