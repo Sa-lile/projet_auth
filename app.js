@@ -15,10 +15,22 @@ app.get('/', (req, res) => {
         res.render('index', { username: 'Sachiyo', password: '12345' });
     });
 
+// Verifier avec JWT ( email or name is correct etc)    
 app.get('/private', (req, res) => {
-            res.render('private', { username: 'Lily', password: '55555' });
-        });
+    const isHaveJWT = false;
 
+    if(!isHaveJWT) {
+        res.status(400).send("You can not accepet")
+    } else {
+        next();
+    }
+        // res.render('private', { username: 'Lily', password: '55555' });
+    });
+
+app.get('/admin', (req, res) => {
+        res.render('admin', { username: 'Leon', password: '22222' });
+    });
+        
 const PORT = process.env.PORT || 3000; 
 // const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
 const users = []
