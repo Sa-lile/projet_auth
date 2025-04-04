@@ -7,6 +7,85 @@ const bcrypt = require('bcrypt');
 dotenv.config();
 const { saveUser, getAllUsers } = require('./models/userModel')
 const app = express();
+const bodyParser = require('body-parser');
+const QRCode = require('qrcode');
+const OTPAuth = require('otpauth');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(session({ secret: 'super-secret', resave: false,
+// saveUninitialized: true }));
+
+// Création d'un utilisateur en mémoire
+const user = {
+    email: 'demo',
+    password: '123',
+    totpSecret: null,
+    mfaValidated: false
+    };
+
+app.get('/login', (req, res) => {
+    res.render('login');
+    });
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    if (email === user.email && password === user.password) {
+    // req.session.authenticated = true;
+    res.redirect('/verify');
+    } else {
+    res.send('Mauvais identifiants.');
+    }
+    });
+
+ app.get('/verify', async (req, res) => {
+    // if (!req.session.authenticated) return res.redirect('/');
+    if (!user.totpSecret) {
+    // Générer une clé TOTP
+    const totp = new OTPAuth.TOTP({
+    issuer: 'MFA-Demo-App',
+    label: user.email,
+    algorithm: 'SHA1',
+    digits: 6,
+    period: 30
+     });
+
+    user.totpSecret = totp.secret.base32;
+    const otpauthUrl = totp.toString(); // format otpauth://...
+    const qr = await QRCode.toDataURL(otpauthUrl); // génération d'un qr
+
+    return res.render('verify', { qr });
+    }
+    res.render('verify', { qr: null });
+});
+
+app.post('/verify', (req, res) => {
+    const { token } = req.body;
+    const totp = new OTPAuth.TOTP({
+    issuer: 'MFA-Demo-App',
+    label: user.email,
+    algorithm: 'SHA1',
+    digits: 6,
+    period: 30,
+    secret: OTPAuth.Secret.fromBase32(user.totpSecret)
+    });
+    const now = Date.now();
+    const delta = totp.validate({ token, timestamp: now });
+    if (delta !== null) {
+    user.mfaValidated = true;
+    res.redirect('/secret');
+    } else {
+    res.send('Code TOTP invalide.');
+    }
+    });
+
+
+
+app.get('/secret', (req, res) => {
+    if (req.session.authenticated && user.mfaValidated) {
+    res.render('secret');
+    } else {
+    res.redirect('/');
+}})
 
 // Spécifier le moteur de templates EJS
 app.set('view engine', 'ejs');
@@ -30,7 +109,13 @@ app.get('/private', (req, res) => {
 app.get('/admin', (req, res) => {
         res.render('admin', { username: 'Leon', password: '22222' });
     });
+      
+    
+getAllUsers((rows) => {
+    rows => [users];
+    // logique qui va comparer les passwords et générer le token  
         
+});
 const PORT = process.env.PORT || 3000; 
 // const users = [{ username: 'sachiyo', password: '12345'}]; // Simule une base de données
 const users = []
@@ -95,6 +180,22 @@ app.post('/login', async(req, res, next) => {
 app.get('/admin', (req, res, next) => {
     res.status(200).render('private');
 })
+
+// app.get('/users',(req, res) => {
+//     getAllUsers((users) => {
+//       res.json(users); 
+    //   const isVaild = bcrypt.compare(password, user.password);
+    //   if(!isVaild) {
+    //       res.status(401).send('Mot de passe incorrect')
+    //       return
+    //   }      // authentication de JWT
+    //   const token = jwt.login({ username: user.username, role: "user"}, jwt_secret_key )
+  
+    //   res.cookie('token', token, { httpOnly: true, sameSite: "lax"})
+    //   res.status(200).send("Bien connect")
+      
+//     });
+//   });
 
 app.listen(PORT, () => {
     console.log(process.env)

@@ -35,9 +35,12 @@ const saveUser = (userData) => {
     return userData;
 };
 
-const getAllUsers = async() => {
-  const [results] = await connection.query('SELECT * FROM users'); 
-  return results
+const getAllUsers = (cb) => {
+  // connection.query('SELECT * FROM users', (err, rows, fields) => {
+  //   if (err) console.error(err)
+  //   console.log('results : ', rows)
+  //   cb(rows)
+  // })
 }
 module.exports = { saveUser, getAllUsers };
 
